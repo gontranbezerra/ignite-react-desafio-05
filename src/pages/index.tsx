@@ -4,8 +4,9 @@ import { FiCalendar, FiUser } from 'react-icons/fi';
 import { format } from 'date-fns';
 
 import Head from 'next/head';
-import Prismic from '@prismicio/client';
+import Link from 'next/link';
 import ptBR from 'date-fns/locale/pt-BR';
+import Prismic from '@prismicio/client';
 
 import { getPrismicClient } from '../services/prismic';
 
@@ -90,18 +91,22 @@ export default function Home(props: HomeProps): JSX.Element {
         <div className={styles.content}>
           {postsOfPage.results.map(post => (
             <div key={post.uid}>
-              <h1>{post.data.title}</h1>
-              <h2>{post.data.subtitle}</h2>
-              <div className={styles.info}>
-                <span>
-                  <FiCalendar />
-                  {post.first_publication_date}
-                </span>
-                <span>
-                  <FiUser />
-                  {post.data.author}
-                </span>
-              </div>
+              <Link href={`/post/${post.uid}`}>
+                <a>
+                  <h1>{post.data.title}</h1>
+                  <h2>{post.data.subtitle}</h2>
+                  <div className={styles.info}>
+                    <span>
+                      <FiCalendar />
+                      {post.first_publication_date}
+                    </span>
+                    <span>
+                      <FiUser />
+                      {post.data.author}
+                    </span>
+                  </div>
+                </a>
+              </Link>
             </div>
           ))}
         </div>
