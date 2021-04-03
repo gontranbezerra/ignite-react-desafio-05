@@ -51,6 +51,24 @@ export default function Post(props: PostProps): JSX.Element {
     });
   }
 
+  function calculateReadTime(): string {
+    const headingTexts = post.data.content
+      .map(el => el.heading)
+      .reduce((acc, cur) => `${acc} ${cur}`)
+      .replace(',', '')
+      .split(' ');
+
+    const bodyTexts = post.data.content
+      .map(el => RichText.asText(el.body))
+      .reduce((acc, cur) => `${acc} ${cur}`)
+      .replace(',', '')
+      .split(' ');
+
+    const totalOfWords = headingTexts.length + bodyTexts.length;
+
+    return `${Math.ceil(totalOfWords / 200)} min`;
+  }
+
   return (
     <>
       <Head>
@@ -80,7 +98,8 @@ export default function Post(props: PostProps): JSX.Element {
                   {post.data.author}
                 </span>
                 <span>
-                  <FiClock /> 4 min
+                  <FiClock />
+                  {calculateReadTime()}
                 </span>
               </div>
 
