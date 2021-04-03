@@ -61,7 +61,7 @@ export default function Post(props: PostProps): JSX.Element {
     const bodyTexts = post.data.content
       .map(el => RichText.asText(el.body))
       .reduce((acc, cur) => `${acc} ${cur}`)
-      .replace(',', '')
+      .replace(/,|\./g, '')
       .split(' ');
 
     const totalOfWords = headingTexts.length + bodyTexts.length;
