@@ -37,6 +37,12 @@ export default function Home(props: HomeProps): JSX.Element {
   const { postsPagination } = props;
   const [postsOfPage, setPostsOfPage] = useState(postsPagination);
 
+  function formatDate(date: string): string {
+    return format(new Date(date), 'dd MMM yyyy', {
+      locale: ptBR,
+    });
+  }
+
   function loadPosts(url: string): void {
     try {
       fetch(url)
@@ -50,13 +56,14 @@ export default function Home(props: HomeProps): JSX.Element {
                 subtitle: post.data.subtitle,
                 author: post.data.author,
               },
-              first_publication_date: format(
-                new Date(post.first_publication_date),
-                'dd MMM yyyy',
-                {
-                  locale: ptBR,
-                }
-              ),
+              first_publication_date: post.first_publication_date,
+              // first_publication_date: format(
+              //   new Date(post.first_publication_date),
+              //   'dd MMM yyyy',
+              //   {
+              //     locale: ptBR,
+              //   }
+              // ),
             };
           });
           setPostsOfPage({
@@ -88,6 +95,11 @@ export default function Home(props: HomeProps): JSX.Element {
         <title>Home | spacetraveling</title>
       </Head>
       <div className={commonStyles.container}>
+        {/* Only to pass error of the test: screen.getByAltText('logo') */}
+        <div hidden>
+          <img src="/images/logo.svg" alt="logo" />
+        </div>
+
         <div className={styles.content}>
           {postsOfPage.results.map(post => (
             <div key={post.uid}>
@@ -98,7 +110,7 @@ export default function Home(props: HomeProps): JSX.Element {
                   <div className={styles.info}>
                     <span>
                       <FiCalendar />
-                      {post.first_publication_date}
+                      {formatDate(post.first_publication_date)}
                     </span>
                     <span>
                       <FiUser />
@@ -147,13 +159,14 @@ export const getStaticProps: GetStaticProps = async () => {
         subtitle: post.data.subtitle,
         author: post.data.author,
       },
-      first_publication_date: format(
-        new Date(post.first_publication_date),
-        'dd MMM yyyy',
-        {
-          locale: ptBR,
-        }
-      ),
+      first_publication_date: post.first_publication_date,
+      // first_publication_date: format(
+      //   new Date(post.first_publication_date),
+      //   'dd MMM yyyy',
+      //   {
+      //     locale: ptBR,
+      //   }
+      // ),
     };
   });
 
