@@ -20,10 +20,11 @@ interface ContentProps {
   }[];
 }
 interface Post {
-  uid: string;
+  uid?: string;
   first_publication_date: string | null;
   data: {
     title: string;
+    subtitle: string;
     banner: {
       url: string;
     };
@@ -85,7 +86,6 @@ export default function Post(props: PostProps): JSX.Element {
 
               <div className={styles.content}>
                 {post.data.content.map((content: ContentProps) => {
-                  // const bodyContent = content.body.toString();
                   const bodyContent = RichText.asHtml(content.body);
 
                   return (
@@ -109,25 +109,35 @@ export default function Post(props: PostProps): JSX.Element {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
+
   const response = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
-      // fetch: ['posts.uid'],
       pageSize: 5,
     }
   );
-  // const response = await prismic.getSingle('posts', {
-  //   pageSize: 5,
-  // });
-  // console.log('>>> getStaticPaths.posts.response.results', response.results);
 
   const posts = response.results.map(post => ({ params: { slug: post.uid } }));
-  // console.log('>>> getStaticPaths.posts', posts);
+
   return {
     paths: posts,
     fallback: true,
   };
 };
+
+interface PostResponse {
+  uid?: string;
+  first_publication_date: string;
+  data: {
+    title: string;
+    subtitle: string;
+    author: string;
+    banner: {
+      url: string;
+    };
+    content: ContentProps[];
+  };
+}
 
 export const getStaticProps: GetStaticProps = async context => {
   const { params } = context;
@@ -135,41 +145,19 @@ export const getStaticProps: GetStaticProps = async context => {
 
   const prismic = getPrismicClient();
 
-  const response = await prismic.getByUID('posts', String(slug), {});
+  const response: PostResponse = await prismic.getByUID(
+    'posts',
+    String(slug),
+    {}
+  );
 
-  // console.log('>>> getStaticProps.response.data: ', response.data);
-  // console.log(
-  //   '>>> getStaticProps.response.data.content[0].body: ',
-  //   JSON.stringify(response.data.content[0].body, null, 2)
-  // );
+  const { title, subtitle, banner, author, content } = response.data;
 
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
-    // first_publication_date: format(
-    //   new Date(response.first_publication_date),
-    //   'dd MMM yyyy',
-    //   {
-    //     locale: ptBR,
-    //   }
-    // ),
-    data: {
-      title: response.data.title,
-      // banner: response.data.image,
-      banner: {
-        url: String(response.data.image.url),
-      },
-      author: response.data.author,
-      // content: response.data.content.map((content: ContentProps) => ({
-      //   heading: content.heading,
-      //   body: RichText.asHtml(content.body),
-      // })),
-      content: response.data.content,
-    },
+    data: { title, subtitle, banner, author, content },
   };
-
-  // console.log('>>> getStaticProps.post: ', post);
-  // console.log('>>> getStaticProps.post.data: ', post.data);
 
   return {
     props: {
